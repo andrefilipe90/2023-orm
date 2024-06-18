@@ -1,6 +1,12 @@
 import sqlite3
 import csv
 
+total_falhas = 0
+
+
+def conta_falhas():
+    total_falhas + 1
+
 
 def extrair_nome_tabelas(database):
     conectar = sqlite3.connect(f"database/{database}.db")
@@ -17,14 +23,19 @@ def exportar_tabelas_csv(database, tabelas):
     conectar = sqlite3.connect(f"database/{database}.db")
     cursor = conectar.cursor()
     for tabela in tabelas:
-        for row in cursor.execute(f"SELECT * FROM {tabela}"):
-            
+        with open(f"teste/{tabela}.csv", "w") as csvfile:
+            write = csv.writer(csvfile)
+            for row in cursor.execute(f"SELECT * FROM {tabela}"):
+                row_filtrada = [
+                    item for item in row if isinstance(item, (int, float, str))
+                ]
+                write.writerow(row_filtrada)
 
 
 database = input("Digite o nome da tabela:")
 tabelas = extrair_nome_tabelas(database)
 exportar_tabelas_csv(database, tabelas)
-
+print(total_falhas)
 # def main() -> None:
 #     number_of_top_customers = int(
 #         input("How many top customers do you want to query? ")
